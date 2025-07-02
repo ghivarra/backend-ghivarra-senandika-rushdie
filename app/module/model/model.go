@@ -18,14 +18,35 @@ type Cart struct {
 	DeletedAt gorm.DeletedAt `gorm:"index"`
 }
 
+type Invoice struct {
+	ID        uint           `gorm:"primaryKey;autoIncrement"`
+	Price     uint           `gorm:"not null"`
+	Details   string         `gorm:"not null"`
+	UserID    uint           `gorm:"index;not null;foreignKey:ID"`
+	User      User           `gorm:"foreignKey:UserID"`
+	CreatedAt time.Time      `gorm:"<-:create;not null;autoCreateTime"`
+	UpdatedAt time.Time      `gorm:"<-:update;not null;autoUpdateTime"`
+	DeletedAt gorm.DeletedAt `gorm:"index"`
+}
+
+type InvoiceOrderList struct {
+	ID        uint    `gorm:"primaryKey;autoIncrement"`
+	InvoiceID uint    `gorm:"index;not null;foreignKey:ID"`
+	Invoice   Invoice `gorm:"foreignKey:InvoiceID"`
+	OrderID   uint    `gorm:"index;not null;foreignKey:ID"`
+	Order     Order   `gorm:"foreignKey:OrderID"`
+}
+
 type Order struct {
 	ID        uint           `gorm:"primaryKey;autoIncrement"`
 	BuyerID   uint           `gorm:"index;not null;foreignKey:ID"`
 	Buyer     User           `gorm:"foreignKey:BuyerID"`
 	SellerID  uint           `gorm:"index;not null;foreignKey:ID"`
 	Seller    User           `gorm:"foreignKey:SellerID"`
-	ProductID uint           `gorm:"index;not null"`
+	ProductID uint           `gorm:"index;not null;foreignKey:ID"`
 	Product   Product        `gorm:"foreignKey:ProductID"`
+	Price     uint           `gorm:"not null"`
+	Quantity  uint           `gorm:"not null"`
 	CreatedAt time.Time      `gorm:"<-:create;not null;autoCreateTime"`
 	UpdatedAt time.Time      `gorm:"<-:update;not null;autoUpdateTime"`
 	DeletedAt gorm.DeletedAt `gorm:"index"`
