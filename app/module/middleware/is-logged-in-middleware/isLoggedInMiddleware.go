@@ -5,6 +5,7 @@ import (
 	"os"
 	"strings"
 
+	"github.com/ghivarra/app/module/library"
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt/v5"
 )
@@ -20,7 +21,7 @@ func Run(c *gin.Context) {
 		return
 	}
 
-	token, err := jwt.Parse(requestToken, func(token *jwt.Token) (interface{}, error) {
+	token, err := jwt.Parse(requestToken, func(token *jwt.Token) (any, error) {
 		_, ok := token.Method.(*jwt.SigningMethodHMAC)
 		if !ok {
 			return nil, fmt.Errorf("failed to sign the JWT")
@@ -39,7 +40,9 @@ func Run(c *gin.Context) {
 
 	// check claim
 	if claims, ok := token.Claims.(jwt.MapClaims); ok {
-
+		// store claims in library
+		// to be used later
+		library.JWTClaim = claims
 	} else {
 		fmt.Println(err)
 		c.AbortWithStatusJSON(401, gin.H{
