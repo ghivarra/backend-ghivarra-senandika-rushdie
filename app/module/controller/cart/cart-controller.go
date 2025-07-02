@@ -51,5 +51,37 @@ func AddProduct(c *gin.Context) {
 }
 
 func Get(c *gin.Context) {
+	// parse data
+	userID, _ := jwt.JWTData.GetSubject()
 
+	// connect db
+	database.Connect()
+
+	type CartData struct {
+		ID           int
+		UserID       int
+		ProductID    int
+		ProductName  string
+		Price        int
+		Stock        int
+		Photo        string
+		Slug         string
+		MerchantID   int
+		MerchantName string
+	}
+
+	var products []CartData
+	database.CONN.Model(&model.Cart{}).
+		Select(`"cart".id`, `"cart".user_id`, `"cart".product_id`, `"product".name as product_name`, "price", "stock", "Photo", "slug", `"product".user_id as merchant_id`, `"user".name as merchant_name`).
+		Joins(`JOIN "product" ON "cart".product_id = "product".id`).
+		Joins(`JOIN "user" ON "product".user_id = "user".id`).
+		Where(`"cart".user_id = ?`, userID).
+		Scan(&products).Debug()
+
+	// return
+	c.JSON(200, gin.H{
+		"status":  "success",
+		"message": "Produk di keranjang berhasil ditarik",
+		"data":    products,
+	})
 }
