@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	"github.com/ghivarra/app/module/controller/auth"
+	"github.com/ghivarra/app/module/controller/product"
 	corsmiddleware "github.com/ghivarra/app/module/middleware/cors-middleware"
 	isloggedinmiddleware "github.com/ghivarra/app/module/middleware/is-logged-in-middleware"
 	"github.com/ghivarra/app/module/service"
@@ -32,6 +33,8 @@ func RouteRegister() *gin.Engine {
 	// group and use middleware
 	adminRouterGroup := router.Group("/admin")
 	adminRouterGroup.Use(isloggedinmiddleware.Run)
+
+	adminRouterGroup.POST("product/create", product.Create)
 
 	return router
 }
