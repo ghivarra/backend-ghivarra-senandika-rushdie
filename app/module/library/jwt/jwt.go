@@ -3,6 +3,7 @@ package jwt
 import (
 	"fmt"
 	"os"
+	"strconv"
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
@@ -12,8 +13,8 @@ var JWTData jwt.MapClaims
 
 func SignJWT(userID int, roleID int) (string, error) {
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
-		"sub":  userID,
-		"role": roleID,
+		"sub":  strconv.Itoa(userID),
+		"role": strconv.Itoa(roleID),
 		"iat":  time.Now(),
 		"exp":  time.Now().Add(time.Hour * 24).Unix(),
 	})

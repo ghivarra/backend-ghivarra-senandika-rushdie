@@ -27,7 +27,6 @@ type Product struct {
 	Photo       string         `gorm:"not null"`
 	Price       uint           `gorm:"not null"`
 	Stock       uint           `gorm:"not null"`
-	Email       string         `gorm:"uniqueIndex;not null"`
 	UserID      uint           `gorm:"index;not null"`
 	User        User           `gorm:"foreignKey:UserID"`
 	CreatedAt   time.Time      `gorm:"<-:create;not null;autoCreateTime"`

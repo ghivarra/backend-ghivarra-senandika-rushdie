@@ -8,6 +8,7 @@ import (
 	"github.com/ghivarra/app/common"
 	"github.com/ghivarra/app/database"
 	"github.com/ghivarra/app/module/library"
+	"github.com/ghivarra/app/module/library/jwt"
 	"github.com/ghivarra/app/module/model"
 	"github.com/gin-gonic/gin"
 )
@@ -31,11 +32,8 @@ func Create(c *gin.Context) {
 		return
 	}
 
-	// connect DB
-	database.Connect()
-
 	// parse form
-	var Product model.Product
+	var data model.Product
 	price, _ := strconv.Atoi(form.Price)
 	stock, _ := strconv.Atoi(form.Stock)
 
@@ -46,14 +44,45 @@ func Create(c *gin.Context) {
 	nameAsSlug = nameAsSlug[:limit]
 	nameAsSlug = fmt.Sprintf("%s-%s", nameAsSlug, library.RandomString(20))
 
-	Product.Name = form.Name
-	Product.Description = form.Description
-	Product.Price = uint(price)
-	Product.Stock = uint(stock)
-	Product.Slug = strings.ToLower(nameAsSlug)
+	data.Name = form.Name
+	data.Description = form.Description
+	data.Price = uint(price)
+	data.Stock = uint(stock)
+	data.Slug = strings.ToLower(nameAsSlug)
 
-	// add photo
-	fmt.Println(common.ROOT)
+	jwtUserID, _ := jwt.JWTData.GetSubject()
+	userID, _ := strconv.Atoi(jwtUserID)
+	data.UserID = uint(userID)
+
+	fmt.Println(jwt.JWTData.GetSubject())
+
+	// upload foto
+	dotIndex := strings.LastIndex(form.Photo.Filename, ".")
+	if dotIndex == -1 {
+		c.AbortWithStatusJSON(400, gin.H{
+			"status":  "error",
+			"message": "Tidak ada ekstensi pada foto yang diupload",
+		})
+	}
+	ext := form.Photo.Filename[dotIndex:]
+
+	fileName := fmt.Sprintf("%s%s", data.Slug, ext)
+	c.SaveUploadedFile(form.Photo, fmt.Sprintf("%s/upload/%s", common.ROOT, fileName))
+
+	// tambah foto
+	data.Photo = fileName
+
+	// simpan foto di DB
+	database.Connect()
+	database.CONN.Create(&data)
+
+	fmt.Println(database.CONN.Error)
+
+	// return
+	c.JSON(200, gin.H{
+		"status":  "success",
+		"message": "Data berhasil diinput",
+	})
 }
 
 func Update(c *gin.Context) {

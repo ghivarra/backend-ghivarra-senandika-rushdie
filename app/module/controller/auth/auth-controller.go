@@ -78,7 +78,7 @@ func Login(c *gin.Context) {
 		UserRoleID uint
 	}
 	var user PartialUser
-	database.CONN.Model(model.User{}).Select("password", "user_role_id").Where("username = ?", form.Username).First(&user)
+	database.CONN.Model(model.User{}).Select("id", "password", "user_role_id").Where("username = ?", form.Username).First(&user)
 
 	if user.Password == "" {
 		c.AbortWithStatusJSON(401, gin.H{
