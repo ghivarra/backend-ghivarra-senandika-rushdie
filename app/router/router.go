@@ -5,6 +5,7 @@ import (
 
 	"github.com/ghivarra/app/module/controller/admin/product"
 	"github.com/ghivarra/app/module/controller/auth"
+	userRole "github.com/ghivarra/app/module/controller/user-role"
 	corsMiddleware "github.com/ghivarra/app/module/middleware/cors-middleware"
 	isLoggedOutMiddleware "github.com/ghivarra/app/module/middleware/is-logged-out-middleware"
 	"github.com/gin-gonic/gin"
@@ -27,6 +28,9 @@ func RouteRegister() *gin.Engine {
 	authRouterGroup.POST("/register", auth.Register)
 	authRouterGroup.POST("/login", auth.Login)
 	authRouterGroup.GET("/check", auth.Check)
+
+	// role list
+	router.GET("/user-role", userRole.Get)
 
 	// group and use middleware
 	adminRouterGroup := router.Group("/admin")
