@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/ghivarra/app/common"
 	"github.com/ghivarra/app/database"
@@ -13,12 +14,33 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func All(c *gin.Context) {
-
-}
-
 func Get(c *gin.Context) {
+	// connect db
+	database.Connect()
 
+	// get all products
+	type PartialProduct struct {
+		ID           uint
+		Slug         string
+		Name         string
+		Description  string
+		Photo        string
+		Price        uint
+		Stock        uint
+		MerchantID   uint
+		MerchantName string
+		CreatedAt    time.Time
+		UpdatedAt    time.Time
+	}
+	var products []PartialProduct
+	database.CONN.Model(&model.Product{}).Select(`"product".id`, `"product".name`, "description", "photo", "price", "stock", "slug", "user_id as merchant_id", `"user".name as merchant_name`, `"product".created_at`, `"product".updated_at`).Joins(`JOIN "user" ON user_id = "user".id`).Find(&products)
+
+	// get all
+	c.JSON(200, gin.H{
+		"status":  "success",
+		"message": "Data berhasil ditarik",
+		"data":    products,
+	})
 }
 
 func Create(c *gin.Context) {

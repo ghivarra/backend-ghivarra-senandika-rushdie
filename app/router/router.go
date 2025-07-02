@@ -40,9 +40,10 @@ func RouteRegister() *gin.Engine {
 
 	router.MaxMultipartMemory = 8 << 20
 	adminProductRouterGroup := adminRouterGroup.Group("/product")
-	adminProductRouterGroup.POST("create", roleCheckMiddleware.Run, product.Create)
-	adminProductRouterGroup.PATCH("update", product.Create)
-	adminProductRouterGroup.DELETE("delete", product.Create)
+	adminProductRouterGroup.GET("/", product.Get)
+	adminProductRouterGroup.POST("/create", roleCheckMiddleware.Run, product.Create)
+	adminProductRouterGroup.PATCH("/update", product.Create)
+	adminProductRouterGroup.DELETE("/delete", product.Create)
 
 	return router
 }
