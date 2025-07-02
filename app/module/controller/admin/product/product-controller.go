@@ -83,8 +83,7 @@ func Create(c *gin.Context) {
 	data.Stock = uint(stock)
 	data.Slug = strings.ToLower(nameAsSlug)
 
-	jwtUserID, _ := jwt.JWTData.GetSubject()
-	userID, _ := strconv.Atoi(jwtUserID)
+	userID := library.GetCurrentUserID()
 	data.UserID = uint(userID)
 
 	fmt.Println(jwt.JWTData.GetSubject())
@@ -124,9 +123,96 @@ func Create(c *gin.Context) {
 }
 
 func Update(c *gin.Context) {
+	var form ProductUpdate
+	errForm := c.ShouldBind(&form)
+	if errForm != nil {
+		c.AbortWithStatusJSON(400, gin.H{
+			"status":  "error",
+			"message": errForm.Error(),
+		})
+		return
+	}
 
+	// parse form
+	var data model.Product
+	price, _ := strconv.Atoi(form.Price)
+	stock, _ := strconv.Atoi(form.Stock)
+
+	// check name length
+	limit := min(len(form.Name), 120)
+
+	nameAsSlug := strings.ReplaceAll(form.Name, " ", "-")
+	nameAsSlug = nameAsSlug[:limit]
+	nameAsSlug = fmt.Sprintf("%s-%s", nameAsSlug, library.RandomString(20))
+
+	data.ID = uint(form.ID)
+	data.Name = form.Name
+	data.Description = form.Description
+	data.Price = uint(price)
+	data.Stock = uint(stock)
+
+	userID := library.GetCurrentUserID()
+	data.UserID = uint(userID)
+
+	fmt.Println(jwt.JWTData.GetSubject())
+
+	// upload foto
+	dotIndex := strings.LastIndex(form.Photo.Filename, ".")
+	if dotIndex == -1 {
+		c.AbortWithStatusJSON(400, gin.H{
+			"status":  "error",
+			"message": "Tidak ada ekstensi pada foto yang diupload",
+		})
+	}
+	ext := form.Photo.Filename[dotIndex:]
+
+	fileName := fmt.Sprintf("%s%s", nameAsSlug, ext)
+	errUpload := c.SaveUploadedFile(form.Photo, fmt.Sprintf("%s/upload/%s", common.ROOT, fileName))
+
+	if errUpload != nil {
+		// update foto
+		data.Photo = fileName
+	}
+
+	// simpan foto di DB
+	database.Connect()
+	err := database.CONN.Model(&model.Product{}).Where("id = ?", form.ID).Save(&data).Error
+	if err != nil {
+		c.AbortWithStatusJSON(500, gin.H{
+			"status":  "error",
+			"message": err.Error(),
+		})
+		return
+	}
+
+	// return
+	c.JSON(200, gin.H{
+		"status":  "success",
+		"message": "Data berhasil diinput",
+	})
 }
 
 func Delete(c *gin.Context) {
+	var form ProductDelete
+	errForm := c.ShouldBindBodyWithJSON(&form)
+	if errForm != nil {
+		c.AbortWithStatusJSON(400, gin.H{
+			"status":  "error",
+			"message": errForm.Error(),
+		})
+		return
+	}
 
+	// delete
+	var deletedData model.Product
+	database.Connect()
+	database.CONN.Model(&model.Product{}).
+		Where("id = ?", form.ID).
+		Delete(&deletedData)
+
+	// return
+	c.JSON(200, gin.H{
+		"status":  "Success",
+		"message": fmt.Sprintf("Produk %s berhasil dihapus", deletedData.Name),
+	})
 }
