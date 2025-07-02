@@ -11,6 +11,7 @@ import (
 
 type ProductAdd struct {
 	ProductID int `json:"product_id" binding:"required,numeric"`
+	Quantity  int `json:"quantity" binding:"required,numeric"`
 }
 
 func AddProduct(c *gin.Context) {
@@ -34,8 +35,22 @@ func AddProduct(c *gin.Context) {
 	var cart model.Cart
 	cart.UserID = uint(intUserID)
 	cart.ProductID = uint(form.ProductID)
+	cart.Quantity = uint(form.Quantity)
 
-	err := database.CONN.Create(&cart).Error
+	// check if already exist
+	type OldData struct {
+		ID       int
+		Quantity int
+	}
+	var oldCartData OldData
+	database.CONN.Model(&model.Cart{}).Select("id", "quantity").Where("user_id = ?", cart.UserID).Where("product_id = ?", cart.ProductID).First(&oldCartData)
+
+	if oldCartData.ID != 0 {
+		cart.ID = uint(oldCartData.ID)
+		cart.Quantity = uint(oldCartData.Quantity + form.Quantity)
+	}
+
+	err := database.CONN.Save(&cart).Error
 	if err != nil {
 		c.AbortWithStatusJSON(500, gin.H{
 			"status":  "error",
@@ -61,6 +76,7 @@ func Get(c *gin.Context) {
 		ID           int
 		UserID       int
 		ProductID    int
+		Quantity     int
 		ProductName  string
 		Price        int
 		Stock        int
@@ -72,7 +88,7 @@ func Get(c *gin.Context) {
 
 	var products []CartData
 	database.CONN.Model(&model.Cart{}).
-		Select(`"cart".id`, `"cart".user_id`, `"cart".product_id`, `"product".name as product_name`, "price", "stock", "Photo", "slug", `"product".user_id as merchant_id`, `"user".name as merchant_name`).
+		Select(`"cart".id`, `"cart".user_id`, `"cart".product_id`, "quantity", `"product".name as product_name`, "price", "stock", "Photo", "slug", `"product".user_id as merchant_id`, `"user".name as merchant_name`).
 		Joins(`JOIN "product" ON "cart".product_id = "product".id`).
 		Joins(`JOIN "user" ON "product".user_id = "user".id`).
 		Where(`"cart".user_id = ?`, userID).

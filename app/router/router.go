@@ -52,5 +52,7 @@ func RouteRegister() *gin.Engine {
 	cartRouterGroup.GET("/", roleCheckMiddleware.Run, cart.Get)
 	cartRouterGroup.POST("/add-product", roleCheckMiddleware.Run, cart.AddProduct)
 
+	// order group
+
 	return router
 }

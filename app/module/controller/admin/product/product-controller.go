@@ -42,7 +42,7 @@ func Get(c *gin.Context) {
 		result = products
 	} else {
 		var products PartialProduct
-		database.CONN.Model(&model.Product{}).Select(`"product".id`, `"product".name`, "description", "photo", "price", "stock", "slug", "user_id as merchant_id", `"user".name as merchant_name`, `"product".created_at`, `"product".updated_at`).Joins(`JOIN "user" ON user_id = "user".id`).Where("id = ?", queryID).Limit(1).First(&products)
+		database.CONN.Model(&model.Product{}).Select(`"product".id`, `"product".name`, "description", "photo", "price", "stock", "slug", "user_id as merchant_id", `"user".name as merchant_name`, `"product".created_at`, `"product".updated_at`).Joins(`JOIN "user" ON user_id = "user".id`).Where(`"product".id = ?`, queryID).Limit(1).First(&products)
 		result = products
 	}
 

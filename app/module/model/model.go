@@ -12,6 +12,7 @@ type Cart struct {
 	User      User           `gorm:"foreignKey:UserID"`
 	ProductID uint           `gorm:"index;not null"`
 	Product   Product        `gorm:"foreignKey:ProductID"`
+	Quantity  uint           `gorm:"default:1"`
 	CreatedAt time.Time      `gorm:"<-:create;not null;autoCreateTime"`
 	UpdatedAt time.Time      `gorm:"<-:update;not null;autoUpdateTime"`
 	DeletedAt gorm.DeletedAt `gorm:"index"`
