@@ -13,7 +13,23 @@ import (
 
 func Register(c *gin.Context) {
 	var form UserRegister
-	c.ShouldBindBodyWithJSON(&form)
+	errForm := c.ShouldBindBodyWithJSON(&form)
+	if errForm != nil {
+		c.AbortWithStatusJSON(401, gin.H{
+			"status":  "error",
+			"message": errForm.Error(),
+		})
+		return
+	}
+
+	// check kesamaan password
+	if form.Password != form.PasswordConfirmation {
+		c.AbortWithStatusJSON(400, gin.H{
+			"status":  "error",
+			"message": "Form password dan konfirmasi password tidak sesuai",
+		})
+		return
+	}
 
 	// hash password
 	hash, _ := bcrypt.GenerateFromPassword([]byte(form.Password), bcrypt.DefaultCost)
@@ -26,22 +42,11 @@ func Register(c *gin.Context) {
 	newUser := model.User{Username: form.Username, Password: form.Password, Name: form.Name, Email: form.Email, UserRoleID: uint(form.UserRoleID)}
 
 	// fail if there is same username or email
-	var total int64
-	database.CONN.Model(&model.User{}).Where("username = ?", form.Username).Or("email = ?", form.Email).Count(&total)
-
-	if total > 0 {
-		c.AbortWithStatusJSON(400, gin.H{
-			"status":  "error",
-			"message": "Username atau Email sudah digunakan oleh akun lain",
-		})
-		return
-	}
-
 	err := database.CONN.Create(&newUser).Error
 	if err != nil {
 		c.AbortWithStatusJSON(500, gin.H{
 			"status":  "error",
-			"message": "Gagal menambah user baru",
+			"message": err.Error(),
 		})
 		return
 	}
@@ -54,7 +59,14 @@ func Register(c *gin.Context) {
 
 func Login(c *gin.Context) {
 	var form UserLogin
-	c.ShouldBindBodyWithJSON(&form)
+	errForm := c.ShouldBindBodyWithJSON(&form)
+	if errForm != nil {
+		c.AbortWithStatusJSON(401, gin.H{
+			"status":  "error",
+			"message": errForm.Error(),
+		})
+		return
+	}
 
 	// connect db and load model
 	database.Connect()
