@@ -49,8 +49,8 @@ func RouteRegister() *gin.Engine {
 	// cart group
 	cartRouterGroup := router.Group("/cart")
 	cartRouterGroup.Use(isLoggedOutMiddleware.Run)
-	cartRouterGroup.GET("/", cart.Get)
-	cartRouterGroup.POST("/add-product", cart.AddProduct)
+	cartRouterGroup.GET("/", roleCheckMiddleware.Run, cart.Get)
+	cartRouterGroup.POST("/add-product", roleCheckMiddleware.Run, cart.AddProduct)
 
 	return router
 }

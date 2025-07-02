@@ -19,6 +19,8 @@ func Run(c *gin.Context) {
 	var module PartialModule
 	database.CONN.Model(&model.UserModule{}).Select("id", "name").Where("name = ?", c.Request.URL).First(&module)
 
+	// fmt.Println(c.Request.URL, module)
+
 	// module not found
 	// then it is for public user
 	if module.Name == "" {
