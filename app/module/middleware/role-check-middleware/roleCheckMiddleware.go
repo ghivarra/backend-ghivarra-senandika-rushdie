@@ -1,6 +1,8 @@
 package roleCheckMiddleware
 
 import (
+	"fmt"
+
 	"github.com/ghivarra/app/database"
 	"github.com/ghivarra/app/module/library/jwt"
 	"github.com/ghivarra/app/module/model"
@@ -30,6 +32,8 @@ func Run(c *gin.Context) {
 	// check modules, if empty then abort with 403 forbidden
 	var total int64
 	database.CONN.Model(&model.UserRoleModuleList{}).Where("user_role_id = ?", jwt.JWTData["role"]).Where("user_module_id = ?", module.ID).Count(&total)
+
+	fmt.Println(total, c.Request.URL, module, jwt.JWTData["role"])
 
 	if total < 1 {
 		c.AbortWithStatusJSON(403, gin.H{

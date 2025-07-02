@@ -3,8 +3,10 @@ package library
 import (
 	"math/rand"
 	"os"
+	"strconv"
 	"time"
 
+	"github.com/ghivarra/app/module/library/jwt"
 	"github.com/gin-gonic/gin"
 )
 
@@ -29,4 +31,12 @@ func RandomString(length int) string {
 		b[i] = charset[seededRand.Intn(len(charset))]
 	}
 	return string(b)
+}
+
+func GetCurrentUserID() int {
+	// parse data
+	userID, _ := jwt.JWTData.GetSubject()
+	intUserID, _ := strconv.Atoi(userID)
+
+	return intUserID
 }

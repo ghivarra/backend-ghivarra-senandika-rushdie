@@ -5,6 +5,7 @@ import (
 	"strconv"
 
 	"github.com/ghivarra/app/database"
+	"github.com/ghivarra/app/module/library"
 	"github.com/ghivarra/app/module/library/jwt"
 	"github.com/ghivarra/app/module/model"
 	"github.com/gin-gonic/gin"
@@ -119,9 +120,7 @@ func Buy(c *gin.Context) {
 	}
 
 	database.Connect()
-	// parse data
-	userID, _ := jwt.JWTData.GetSubject()
-	intUserID, _ := strconv.Atoi(userID)
+	intUserID := library.GetCurrentUserID()
 
 	// get all data
 	type CartItem struct {
