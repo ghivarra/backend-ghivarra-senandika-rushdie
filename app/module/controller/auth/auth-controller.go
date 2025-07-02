@@ -60,10 +60,12 @@ func Login(c *gin.Context) {
 	database.Connect()
 
 	// get result
-	var user userModel.User
-	database.CONN.Select("password", "user_role_id").Where("username = ?", form.Username).First(&user)
-
-	fmt.Println(user)
+	type PartialUser struct {
+		Password   string
+		UserRoleID uint
+	}
+	var user PartialUser
+	database.CONN.Model(userModel.User{}).Select("password", "user_role_id").Where("username = ?", form.Username).First(&user)
 
 	if user.Password == "" {
 		c.AbortWithStatusJSON(401, gin.H{
@@ -123,8 +125,6 @@ func Check(c *gin.Context) {
 		})
 		return
 	}
-
-	fmt.Println(bearerToken)
 
 	c.JSON(200, gin.H{
 		"status":  "success",
