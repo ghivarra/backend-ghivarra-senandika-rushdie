@@ -1,101 +1,89 @@
 package auth
 
 import (
-	"context"
 	"fmt"
-	"os"
-	"time"
 
-	"github.com/Masterminds/squirrel"
 	"github.com/ghivarra/app/module/database"
-	"github.com/ghivarra/app/module/library"
+	"github.com/ghivarra/app/module/library/jwt"
+	userModel "github.com/ghivarra/app/module/model/usermodel"
 	"github.com/gin-gonic/gin"
-	"github.com/golang-jwt/jwt/v5"
 	"golang.org/x/crypto/bcrypt"
 )
 
-func signJWT(data JWTData) (string, error) {
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
-		"aud": data.Username,
-		"sub": data.UserRoleID,
-		"iat": time.Now(),
-		"exp": time.Now().Add(time.Hour * 24).Unix(),
-	})
-
-	key := []byte(os.Getenv("JWT_KEY"))
-	tokenString, err := token.SignedString(key)
-
-	if err != nil {
-		return "", err
-	}
-
-	return tokenString, nil
-}
-
 func Register(c *gin.Context) {
-	var user UserRegister
-	c.ShouldBindBodyWithJSON(&user)
+	var form UserRegister
+	c.ShouldBindBodyWithJSON(&form)
 
-	hash, _ := bcrypt.GenerateFromPassword([]byte(user.Password), bcrypt.DefaultCost)
-	user.Password = string(hash)
+	// hash password
+	hash, _ := bcrypt.GenerateFromPassword([]byte(form.Password), bcrypt.DefaultCost)
+	form.Password = string(hash)
 
+	// connect DB
 	database.Connect()
-	query, param, err := sq.Insert(`"user"`).Columns("username", "password", "email", "name", "user_role_id").Values(user.Username, user.Password, user.Email, user.Name, user.UserRoleID).ToSql()
 
-	fmt.Println(query, param)
+	// seed new user
+	newUser := userModel.User{Username: form.Username, Password: form.Password, Name: form.Name, Email: form.Email, UserRoleID: uint(form.UserRoleID)}
 
-	if err != nil {
-		library.ErrorServer("Failed to connect to database", err, c)
+	// fail if there is same username or email
+	var total int64
+	database.CONN.Model(&userModel.User{}).Where("username = ?", form.Username).Or("email = ?", form.Email).Count(&total)
+
+	if total > 0 {
+		c.AbortWithStatusJSON(400, gin.H{
+			"status":  "error",
+			"message": "Username atau Email sudah digunakan oleh akun lain",
+		})
+		return
 	}
 
-	_, err = database.DB.Query(context.Background(), query, param...)
+	err := database.CONN.Create(&newUser).Error
 	if err != nil {
-		library.ErrorServer("Failed to query database", err, c)
+		c.AbortWithStatusJSON(500, gin.H{
+			"status":  "error",
+			"message": "Gagal menambah user baru",
+		})
+		return
 	}
+
+	c.JSON(200, gin.H{
+		"status":  "success",
+		"message": fmt.Sprintf("User %s berhasil ditambahkan", form.Name),
+	})
 }
 
 func Login(c *gin.Context) {
-	var user UserLogin
-	c.ShouldBindBodyWithJSON(&user)
+	var form UserLogin
+	c.ShouldBindBodyWithJSON(&form)
 
+	// connect db and load model
 	database.Connect()
 
-	condition := squirrel.Eq{"username": user.Username}
+	// get result
+	var user userModel.User
+	database.CONN.Select("password", "user_role_id").Where("username = ?", form.Username).First(&user)
 
-	query, param, err := sq.Select("id", "password", "user_role_id").From(`"user"`).Where(condition).Limit(1).ToSql()
+	fmt.Println(user)
 
-	if err != nil {
-		library.ErrorServer("Failed to connect to database", err, c)
+	if user.Password == "" {
+		c.AbortWithStatusJSON(401, gin.H{
+			"status":  "error",
+			"message": "Kombinasi akun dan password tidak cocok",
+		})
+		return
 	}
 
-	result, err := database.DB.Query(context.Background(), query, param...)
-	if err != nil {
-		library.ErrorServer("Failed to query database", err, c)
-	}
-
-	id := ""
-	passwordHash := ""
-	userRoleID := ""
-
-	for result.Next() {
-		result.Scan(&id, &passwordHash, &userRoleID)
-	}
-
-	check := bcrypt.CompareHashAndPassword([]byte(passwordHash), []byte(user.Password))
+	// validate password
+	check := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(form.Password))
 
 	if check != nil {
 		c.JSON(401, gin.H{
 			"status":  "error",
-			"message": "Akun dan password tidak cocok",
+			"message": "Kombinasi akun dan password tidak cocok",
 		})
 	}
 
 	// sign with JWT
-	var jwtData JWTData
-	jwtData.Username = user.Username
-	jwtData.UserRoleID = userRoleID
-	token, errSign := signJWT(jwtData)
-
+	token, errSign := jwt.SignJWT(form.Username, int(user.UserRoleID))
 	if errSign != nil {
 		c.JSON(500, gin.H{
 			"status":  "error",
@@ -103,8 +91,6 @@ func Login(c *gin.Context) {
 		})
 		return
 	}
-
-	fmt.Println(token)
 
 	// return berhasil
 	c.JSON(200, gin.H{

@@ -1,19 +1,16 @@
 package isloggedinmiddleware
 
 import (
-	"fmt"
-	"os"
 	"strings"
 
-	"github.com/ghivarra/app/module/library"
+	"github.com/ghivarra/app/module/library/jwt"
 	"github.com/gin-gonic/gin"
-	"github.com/golang-jwt/jwt/v5"
 )
 
 func Run(c *gin.Context) {
 	authHeader := c.GetHeader("Authorization")
-	requestToken := strings.Replace(authHeader, "Bearer ", "", 1)
-	if requestToken == "" {
+	bearerToken := strings.Replace(authHeader, "Bearer ", "", 1)
+	if bearerToken == "" {
 		c.AbortWithStatusJSON(401, gin.H{
 			"status":  "error",
 			"message": "Anda harus login terlebih dahulu",
@@ -21,30 +18,9 @@ func Run(c *gin.Context) {
 		return
 	}
 
-	token, err := jwt.Parse(requestToken, func(token *jwt.Token) (any, error) {
-		_, ok := token.Method.(*jwt.SigningMethodHMAC)
-		if !ok {
-			return nil, fmt.Errorf("failed to sign the JWT")
-		}
-		return []byte(os.Getenv("JWT_KEY")), nil
-	}, jwt.WithValidMethods([]string{jwt.SigningMethodHS256.Alg()}))
-
-	if err != nil {
-		fmt.Println(err)
-		c.AbortWithStatusJSON(401, gin.H{
-			"status":  "error",
-			"message": "Anda harus login terlebih dahulu",
-		})
-		return
-	}
-
-	// check claim
-	if claims, ok := token.Claims.(jwt.MapClaims); ok {
-		// store claims in library
-		// to be used later
-		library.JWTClaim = claims
-	} else {
-		fmt.Println(err)
+	// validate
+	valid, err := jwt.ValidateJWT(bearerToken)
+	if err != nil || !valid {
 		c.AbortWithStatusJSON(401, gin.H{
 			"status":  "error",
 			"message": "Anda harus login terlebih dahulu",

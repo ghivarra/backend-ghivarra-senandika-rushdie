@@ -1,28 +1,29 @@
 package database
 
 import (
-	"context"
 	"fmt"
 	"os"
-	"time"
 
-	"github.com/jackc/pgx/v5/pgxpool"
+	"gorm.io/driver/postgres"
+	"gorm.io/gorm"
+	"gorm.io/gorm/schema"
 )
 
-var DB *pgxpool.Pool
+var CONN *gorm.DB
 
 func Connect() error {
-	dsn := os.Getenv("DB_DSN")
+	dsn := fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%s sslmode=%s TimeZone=%s", os.Getenv("DB_HOST"), os.Getenv("DB_USER"), os.Getenv("DB_PASS"), os.Getenv("DB_NAME"), os.Getenv("DB_PORT"), os.Getenv("DB_SSL"), os.Getenv("DB_TIMEZONE"))
 
-	// get timeout connect
-	context, cancel := context.WithTimeout(context.Background(), 5*time.Second)
-	defer cancel()
+	gormDB, err := gorm.Open(postgres.Open(dsn), &gorm.Config{
+		NamingStrategy: schema.NamingStrategy{
+			SingularTable: true,
+		},
+	})
 
-	pool, err := pgxpool.New(context, dsn)
 	if err != nil {
 		return fmt.Errorf("failed to connect to the database. Reason: %v", err)
 	}
 
-	DB = pool
+	CONN = gormDB
 	return nil
 }

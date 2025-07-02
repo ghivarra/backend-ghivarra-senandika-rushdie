@@ -7,7 +7,6 @@ import (
 )
 
 var sq = squirrel.StatementBuilder.PlaceholderFormat(squirrel.Dollar)
-var roleName string
 
 type ProductCreate struct {
 	Name        string                `form:"name"`

@@ -3,11 +3,10 @@ package router
 import (
 	"net/http"
 
+	"github.com/ghivarra/app/module/controller/admin/product"
 	"github.com/ghivarra/app/module/controller/auth"
-	"github.com/ghivarra/app/module/controller/product"
 	corsmiddleware "github.com/ghivarra/app/module/middleware/cors-middleware"
 	isloggedinmiddleware "github.com/ghivarra/app/module/middleware/is-logged-in-middleware"
-	"github.com/ghivarra/app/module/service"
 	"github.com/gin-gonic/gin"
 )
 
@@ -22,9 +21,6 @@ func RouteRegister() *gin.Engine {
 			"message": "Service is running normally.",
 		})
 	})
-
-	router.GET("/product", service.ProductGet)
-	router.GET("/user", service.UserGetAll)
 
 	// register
 	router.POST("/register", auth.Register)

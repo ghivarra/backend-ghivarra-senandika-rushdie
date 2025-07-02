@@ -17,7 +17,10 @@ func Create(c *gin.Context) {
 	var form ProductCreate
 	c.ShouldBind(&form)
 
+	// connect DB
 	database.Connect()
+
+	// get user
 
 }
 
