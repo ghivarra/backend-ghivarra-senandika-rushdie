@@ -1,9 +1,5 @@
 package auth
 
-import "github.com/Masterminds/squirrel"
-
-var sq = squirrel.StatementBuilder.PlaceholderFormat(squirrel.Dollar)
-
 type UserRegister struct {
 	Username   string `json:"username" bind:"alpha"`
 	Password   string `json:"password"`
@@ -15,9 +11,4 @@ type UserRegister struct {
 type UserLogin struct {
 	Username string `json:"username"`
 	Password string `json:"password"`
-}
-
-type JWTData struct {
-	Username   string
-	UserRoleID string
 }
