@@ -6,7 +6,7 @@ import (
 
 	"github.com/ghivarra/app/database"
 	"github.com/ghivarra/app/module/library/jwt"
-	userModel "github.com/ghivarra/app/module/model/user-model"
+	"github.com/ghivarra/app/module/model"
 	"github.com/gin-gonic/gin"
 	"golang.org/x/crypto/bcrypt"
 )
@@ -23,11 +23,11 @@ func Register(c *gin.Context) {
 	database.Connect()
 
 	// seed new user
-	newUser := userModel.User{Username: form.Username, Password: form.Password, Name: form.Name, Email: form.Email, UserRoleID: uint(form.UserRoleID)}
+	newUser := model.User{Username: form.Username, Password: form.Password, Name: form.Name, Email: form.Email, UserRoleID: uint(form.UserRoleID)}
 
 	// fail if there is same username or email
 	var total int64
-	database.CONN.Model(&userModel.User{}).Where("username = ?", form.Username).Or("email = ?", form.Email).Count(&total)
+	database.CONN.Model(&model.User{}).Where("username = ?", form.Username).Or("email = ?", form.Email).Count(&total)
 
 	if total > 0 {
 		c.AbortWithStatusJSON(400, gin.H{
@@ -65,7 +65,7 @@ func Login(c *gin.Context) {
 		UserRoleID uint
 	}
 	var user PartialUser
-	database.CONN.Model(userModel.User{}).Select("password", "user_role_id").Where("username = ?", form.Username).First(&user)
+	database.CONN.Model(model.User{}).Select("password", "user_role_id").Where("username = ?", form.Username).First(&user)
 
 	if user.Password == "" {
 		c.AbortWithStatusJSON(401, gin.H{

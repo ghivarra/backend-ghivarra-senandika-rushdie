@@ -32,11 +32,14 @@ func RouteRegister() *gin.Engine {
 	// role list
 	router.GET("/user-role", userRole.Get)
 
-	// group and use middleware
+	// admin group
 	adminRouterGroup := router.Group("/admin")
 	adminRouterGroup.Use(isLoggedOutMiddleware.Run)
 
-	adminRouterGroup.POST("product/create", product.Create)
+	adminProductRouterGroup := adminRouterGroup.Group("/product")
+	adminProductRouterGroup.POST("product/create", product.Create)
+	adminProductRouterGroup.PATCH("product/update", product.Create)
+	adminProductRouterGroup.DELETE("product/delete", product.Create)
 
 	return router
 }
