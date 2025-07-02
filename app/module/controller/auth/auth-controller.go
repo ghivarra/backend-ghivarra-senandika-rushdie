@@ -2,10 +2,11 @@ package auth
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/ghivarra/app/database"
 	"github.com/ghivarra/app/module/library/jwt"
-	userModel "github.com/ghivarra/app/module/model/usermodel"
+	userModel "github.com/ghivarra/app/module/model/user-model"
 	"github.com/gin-gonic/gin"
 	"golang.org/x/crypto/bcrypt"
 )
@@ -99,5 +100,34 @@ func Login(c *gin.Context) {
 		"data": gin.H{
 			"token": token,
 		},
+	})
+}
+
+func Check(c *gin.Context) {
+	authHeader := c.GetHeader("Authorization")
+	bearerToken := strings.Replace(authHeader, "Bearer ", "", 1)
+	if bearerToken == "" {
+		c.AbortWithStatusJSON(401, gin.H{
+			"status":  "error",
+			"message": "Anda belum terotentikasi",
+		})
+		return
+	}
+
+	// validate
+	valid, err := jwt.ValidateJWT(bearerToken)
+	if err != nil || !valid {
+		c.AbortWithStatusJSON(401, gin.H{
+			"status":  "error",
+			"message": "Anda belum terotentikasi",
+		})
+		return
+	}
+
+	fmt.Println(bearerToken)
+
+	c.JSON(200, gin.H{
+		"status":  "success",
+		"message": "Anda sudah terotentikasi",
 	})
 }

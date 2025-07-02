@@ -1,4 +1,4 @@
-package isLoggedInMiddleware
+package isLoggedOutMiddleware
 
 import (
 	"strings"
