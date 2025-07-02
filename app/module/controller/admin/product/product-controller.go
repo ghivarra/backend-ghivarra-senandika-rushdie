@@ -5,9 +5,9 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/ghivarra/app/common"
 	"github.com/ghivarra/app/database"
 	"github.com/ghivarra/app/module/library"
-	"github.com/ghivarra/app/module/library/jwt"
 	"github.com/ghivarra/app/module/model"
 	"github.com/gin-gonic/gin"
 )
@@ -31,18 +31,6 @@ func Create(c *gin.Context) {
 		return
 	}
 
-	// validate access
-	username, err := jwt.JWTData.GetSubject()
-	if err != nil {
-		c.AbortWithStatusJSON(401, gin.H{
-			"status":  "error",
-			"message": errForm.Error(),
-		})
-		return
-	}
-
-	fmt.Println(username)
-
 	// connect DB
 	database.Connect()
 
@@ -51,8 +39,11 @@ func Create(c *gin.Context) {
 	price, _ := strconv.Atoi(form.Price)
 	stock, _ := strconv.Atoi(form.Stock)
 
-	nameAsSlug := strings.ReplaceAll(form.Name, " ", "")
-	nameAsSlug = nameAsSlug[:120]
+	// check name length
+	limit := min(len(form.Name), 120)
+
+	nameAsSlug := strings.ReplaceAll(form.Name, " ", "-")
+	nameAsSlug = nameAsSlug[:limit]
 	nameAsSlug = fmt.Sprintf("%s-%s", nameAsSlug, library.RandomString(20))
 
 	Product.Name = form.Name
@@ -61,7 +52,8 @@ func Create(c *gin.Context) {
 	Product.Stock = uint(stock)
 	Product.Slug = strings.ToLower(nameAsSlug)
 
-	// convert all slug into -
+	// add photo
+	fmt.Println(common.ROOT)
 }
 
 func Update(c *gin.Context) {

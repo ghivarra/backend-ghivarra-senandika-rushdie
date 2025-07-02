@@ -2,19 +2,18 @@ package main
 
 import (
 	"log"
-	"path"
+	"os"
 
+	"github.com/ghivarra/app/common"
 	"github.com/ghivarra/app/router"
 	"github.com/ghivarra/app/server"
 	"github.com/joho/godotenv"
 )
 
-var ROOT string
-
 func main() {
 
 	// put root
-	ROOT = path.Clean("/")
+	common.ROOT, _ = os.Getwd()
 
 	// load environment
 	errEnv := godotenv.Load("./.env")
