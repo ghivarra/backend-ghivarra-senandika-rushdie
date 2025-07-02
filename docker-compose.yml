@@ -1,0 +1,14 @@
+services:
+  marketplace-backend-go:
+    image: marketplace-backend-go:1.0.0
+    container_name: marketplace-backend-go
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - 127.0.0.1:6789:6789
+    develop:
+      watch:
+        - action: sync+restart
+          path: ./src
+          target: ./

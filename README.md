@@ -1,2 +1,2 @@
-# backend-marketplace-go
-Marketplace Backend using GO
+# README
+Marketplace Merah Kuning Hijau
