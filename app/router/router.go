@@ -8,6 +8,7 @@ import (
 	userRole "github.com/ghivarra/app/module/controller/user-role"
 	corsMiddleware "github.com/ghivarra/app/module/middleware/cors-middleware"
 	isLoggedOutMiddleware "github.com/ghivarra/app/module/middleware/is-logged-out-middleware"
+	roleCheckMiddleware "github.com/ghivarra/app/module/middleware/role-check-middleware"
 	"github.com/gin-gonic/gin"
 )
 
@@ -15,11 +16,12 @@ func RouteRegister() *gin.Engine {
 	router := gin.Default()
 
 	router.Use(corsMiddleware.Run())
+	router.Use(gin.Recovery())
 
 	router.GET("/", func(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{
 			"status":  "success",
-			"message": "Service is running normally.",
+			"message": "Layanan berfungsi secara normal.",
 		})
 	})
 
@@ -36,10 +38,11 @@ func RouteRegister() *gin.Engine {
 	adminRouterGroup := router.Group("/admin")
 	adminRouterGroup.Use(isLoggedOutMiddleware.Run)
 
+	router.MaxMultipartMemory = 8 << 20
 	adminProductRouterGroup := adminRouterGroup.Group("/product")
-	adminProductRouterGroup.POST("product/create", product.Create)
-	adminProductRouterGroup.PATCH("product/update", product.Create)
-	adminProductRouterGroup.DELETE("product/delete", product.Create)
+	adminProductRouterGroup.POST("create", roleCheckMiddleware.Run, product.Create)
+	adminProductRouterGroup.PATCH("update", product.Create)
+	adminProductRouterGroup.DELETE("delete", product.Create)
 
 	return router
 }

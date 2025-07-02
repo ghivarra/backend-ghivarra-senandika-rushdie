@@ -10,9 +10,9 @@ import (
 
 var JWTData jwt.MapClaims
 
-func SignJWT(username string, roleID int) (string, error) {
+func SignJWT(userID int, roleID int) (string, error) {
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
-		"sub":  username,
+		"sub":  userID,
 		"role": roleID,
 		"iat":  time.Now(),
 		"exp":  time.Now().Add(time.Hour * 24).Unix(),

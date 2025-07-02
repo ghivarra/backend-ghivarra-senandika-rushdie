@@ -73,6 +73,7 @@ func Login(c *gin.Context) {
 
 	// get result
 	type PartialUser struct {
+		ID         uint
 		Password   string
 		UserRoleID uint
 	}
@@ -98,7 +99,7 @@ func Login(c *gin.Context) {
 	}
 
 	// sign with JWT
-	token, errSign := jwt.SignJWT(form.Username, int(user.UserRoleID))
+	token, errSign := jwt.SignJWT(int(user.ID), int(user.UserRoleID))
 	if errSign != nil {
 		c.JSON(500, gin.H{
 			"status":  "error",
