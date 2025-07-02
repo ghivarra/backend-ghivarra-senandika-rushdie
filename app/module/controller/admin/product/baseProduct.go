@@ -2,16 +2,12 @@ package product
 
 import (
 	"mime/multipart"
-
-	"github.com/Masterminds/squirrel"
 )
 
-var sq = squirrel.StatementBuilder.PlaceholderFormat(squirrel.Dollar)
-
 type ProductCreate struct {
-	Name        string                `form:"name"`
+	Name        string                `form:"name" binding:"required,max=150"`
 	Description string                `form:"description"`
+	Price       string                `form:"price" binding:"required,numeric"`
+	Stock       string                `form:"stock" binding:"required,numeric"`
 	Photo       *multipart.FileHeader `form:"photo"`
-	Price       string                `form:"price"`
-	Stock       string                `form:"stock"`
 }
