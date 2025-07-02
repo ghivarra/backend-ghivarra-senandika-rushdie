@@ -3,7 +3,7 @@ package auth
 import (
 	"fmt"
 
-	"github.com/ghivarra/app/module/database"
+	"github.com/ghivarra/app/database"
 	"github.com/ghivarra/app/module/library/jwt"
 	userModel "github.com/ghivarra/app/module/model/usermodel"
 	"github.com/gin-gonic/gin"

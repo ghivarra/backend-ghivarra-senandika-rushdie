@@ -4,7 +4,7 @@ import (
 	"log"
 	"path"
 
-	"github.com/ghivarra/app/module/router"
+	"github.com/ghivarra/app/router"
 	"github.com/ghivarra/app/server"
 	"github.com/joho/godotenv"
 )

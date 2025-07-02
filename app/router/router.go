@@ -5,15 +5,15 @@ import (
 
 	"github.com/ghivarra/app/module/controller/admin/product"
 	"github.com/ghivarra/app/module/controller/auth"
-	corsmiddleware "github.com/ghivarra/app/module/middleware/cors-middleware"
-	isloggedinmiddleware "github.com/ghivarra/app/module/middleware/is-logged-in-middleware"
+	corsMiddleware "github.com/ghivarra/app/module/middleware/cors-middleware"
+	isLoggedInMiddleware "github.com/ghivarra/app/module/middleware/is-logged-out-middleware"
 	"github.com/gin-gonic/gin"
 )
 
 func RouteRegister() *gin.Engine {
 	router := gin.Default()
 
-	router.Use(corsmiddleware.Run())
+	router.Use(corsMiddleware.Run())
 
 	router.GET("/", func(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{
@@ -22,13 +22,14 @@ func RouteRegister() *gin.Engine {
 		})
 	})
 
-	// register
-	router.POST("/register", auth.Register)
-	router.POST("/login", auth.Login)
+	// register & login
+	authRouterGroup := router.Group("/auth")
+	authRouterGroup.POST("/register", auth.Register)
+	authRouterGroup.POST("/login", auth.Login)
 
 	// group and use middleware
 	adminRouterGroup := router.Group("/admin")
-	adminRouterGroup.Use(isloggedinmiddleware.Run)
+	adminRouterGroup.Use(isLoggedInMiddleware.Run)
 
 	adminRouterGroup.POST("product/create", product.Create)
 

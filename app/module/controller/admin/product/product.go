@@ -1,7 +1,7 @@
 package product
 
 import (
-	"github.com/ghivarra/app/module/database"
+	"github.com/ghivarra/app/database"
 	"github.com/gin-gonic/gin"
 )
 
