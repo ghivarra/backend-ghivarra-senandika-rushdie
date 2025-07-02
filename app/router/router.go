@@ -5,6 +5,7 @@ import (
 
 	"github.com/ghivarra/app/module/controller/admin/product"
 	"github.com/ghivarra/app/module/controller/auth"
+	"github.com/ghivarra/app/module/controller/cart"
 	userRole "github.com/ghivarra/app/module/controller/user-role"
 	corsMiddleware "github.com/ghivarra/app/module/middleware/cors-middleware"
 	isLoggedOutMiddleware "github.com/ghivarra/app/module/middleware/is-logged-out-middleware"
@@ -44,6 +45,12 @@ func RouteRegister() *gin.Engine {
 	adminProductRouterGroup.POST("/create", roleCheckMiddleware.Run, product.Create)
 	adminProductRouterGroup.PATCH("/update", product.Create)
 	adminProductRouterGroup.DELETE("/delete", product.Create)
+
+	// cart group
+	cartRouterGroup := router.Group("/cart")
+	cartRouterGroup.Use(isLoggedOutMiddleware.Run)
+	cartRouterGroup.GET("/", cart.Get)
+	cartRouterGroup.POST("/add-product", cart.AddProduct)
 
 	return router
 }

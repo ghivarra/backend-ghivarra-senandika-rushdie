@@ -6,6 +6,17 @@ import (
 	"gorm.io/gorm"
 )
 
+type Cart struct {
+	ID        uint           `gorm:"primaryKey;autoIncrement"`
+	UserID    uint           `gorm:"index;not null;foreignKey:ID"`
+	User      User           `gorm:"foreignKey:UserID"`
+	ProductID uint           `gorm:"index;not null"`
+	Product   Product        `gorm:"foreignKey:ProductID"`
+	CreatedAt time.Time      `gorm:"<-:create;not null;autoCreateTime"`
+	UpdatedAt time.Time      `gorm:"<-:update;not null;autoUpdateTime"`
+	DeletedAt gorm.DeletedAt `gorm:"index"`
+}
+
 type Order struct {
 	ID        uint           `gorm:"primaryKey;autoIncrement"`
 	BuyerID   uint           `gorm:"index;not null;foreignKey:ID"`

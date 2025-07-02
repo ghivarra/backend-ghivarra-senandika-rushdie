@@ -32,14 +32,25 @@ func Get(c *gin.Context) {
 		CreatedAt    time.Time
 		UpdatedAt    time.Time
 	}
-	var products []PartialProduct
-	database.CONN.Model(&model.Product{}).Select(`"product".id`, `"product".name`, "description", "photo", "price", "stock", "slug", "user_id as merchant_id", `"user".name as merchant_name`, `"product".created_at`, `"product".updated_at`).Joins(`JOIN "user" ON user_id = "user".id`).Find(&products)
+
+	// check if singular or plural
+	queryID := c.Query("id")
+	var result any
+	if queryID == "" {
+		var products []PartialProduct
+		database.CONN.Model(&model.Product{}).Select(`"product".id`, `"product".name`, "description", "photo", "price", "stock", "slug", "user_id as merchant_id", `"user".name as merchant_name`, `"product".created_at`, `"product".updated_at`).Joins(`JOIN "user" ON user_id = "user".id`).Find(&products)
+		result = products
+	} else {
+		var products PartialProduct
+		database.CONN.Model(&model.Product{}).Select(`"product".id`, `"product".name`, "description", "photo", "price", "stock", "slug", "user_id as merchant_id", `"user".name as merchant_name`, `"product".created_at`, `"product".updated_at`).Joins(`JOIN "user" ON user_id = "user".id`).Where("id = ?", queryID).Limit(1).First(&products)
+		result = products
+	}
 
 	// get all
 	c.JSON(200, gin.H{
 		"status":  "success",
 		"message": "Data berhasil ditarik",
-		"data":    products,
+		"data":    result,
 	})
 }
 
@@ -96,9 +107,14 @@ func Create(c *gin.Context) {
 
 	// simpan foto di DB
 	database.Connect()
-	database.CONN.Create(&data)
-
-	fmt.Println(database.CONN.Error)
+	err := database.CONN.Create(&data).Error
+	if err != nil {
+		c.AbortWithStatusJSON(500, gin.H{
+			"status":  "error",
+			"message": err.Error(),
+		})
+		return
+	}
 
 	// return
 	c.JSON(200, gin.H{
