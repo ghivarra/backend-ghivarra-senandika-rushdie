@@ -3,6 +3,7 @@ package router
 import (
 	"net/http"
 
+	"github.com/ghivarra/app/module/controller/auth"
 	corsmiddleware "github.com/ghivarra/app/module/middleware/cors-middleware"
 	"github.com/ghivarra/app/module/service"
 	"github.com/gin-gonic/gin"
@@ -21,7 +22,11 @@ func RouteRegister() *gin.Engine {
 	})
 
 	router.GET("/product", service.ProductGet)
-	router.GET("/user", service.UserGet)
+	router.GET("/user", service.UserGetAll)
+
+	// register
+	router.POST("/register", auth.Register)
+	router.POST("/login", auth.Login)
 
 	return router
 }

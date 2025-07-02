@@ -17,10 +17,11 @@ type ProductType struct {
 }
 
 type User struct {
-	id           string
-	username     string
-	password     string
-	name         string
-	email        string
-	user_role_id string
+	ID           string
+	Username     string
+	Password     string
+	Name         string
+	Email        string
+	UserRoleID   string
+	UserRoleName string
 }

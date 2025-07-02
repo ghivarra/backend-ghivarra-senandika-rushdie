@@ -10,10 +10,8 @@ import (
 )
 
 // Get all product
-func UserGet(c *gin.Context) {
-	query, param, err := builder.Select("id", "username", "password", "name", "email", "user_role_id").From(`"user"`).ToSql()
-
-	fmt.Println(query, param)
+func UserGetAll(c *gin.Context) {
+	query, param, err := builder.Select(`"user".id`, "username", "password", `"user".name`, "email", "user_role_id", `"user_role".name AS user_role_name`).From(`"user"`).Join(`"user_role" ON user_role_id = "user_role".id`).ToSql()
 
 	if err != nil {
 		library.ErrorServer("Failed to connect to database", err, c)
@@ -27,11 +25,12 @@ func UserGet(c *gin.Context) {
 	}
 
 	var users []User
-	var user User
 
 	for result.Next() {
 
-		err = result.Scan(&user.id, &user.username, &user.password, &user.name, &user.email, &user.user_role_id)
+		var user User
+
+		err = result.Scan(&user.ID, &user.Username, &user.Password, &user.Name, &user.Email, &user.UserRoleID, &user.UserRoleName)
 
 		if err != nil {
 			fmt.Println(err)
@@ -40,5 +39,9 @@ func UserGet(c *gin.Context) {
 		users = append(users, user)
 	}
 
-	fmt.Println(users)
+	c.JSON(200, gin.H{
+		"status":  "success",
+		"message": "Data berhasil ditarik",
+		"data":    users,
+	})
 }
