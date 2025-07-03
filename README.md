@@ -47,6 +47,9 @@ $ psql -U nama_user -d nama_db < marketplace.sql
 ```
 
 ## DEPLOYMENT
+
+Sebelum deployment, pastikan konfigurasi file .env sudah sesuai dengan yang akan dijalankan.
+
 - ### Docker (Any OS)
 
 Install Docker, deploy, dan generate image berdasarkan file Dockerfile yang tersedia.
