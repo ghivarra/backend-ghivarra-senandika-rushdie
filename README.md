@@ -30,7 +30,7 @@ CREATE DATABASE nama_db;
 - Ubah kepemilikan tabel menjadi nama_user
 
 ```
-ALTER TABLE nama_db OWNER TO nama_user;
+ALTER DATABASE nama_db OWNER TO nama_user;
 ```
 - Keluar dari PostgreSQL
 ```
@@ -40,7 +40,7 @@ ALTER TABLE nama_db OWNER TO nama_user;
 - Lalu selanjutnya jalankan command di bawah ini tepat di root folder aplikasi ini melalui CLI, dan masukkan password:
 
 ```
-$ psql -U nama_user -d nama_db --no-owner --no-privileges < marketplace.sql
+$ psql -U nama_user -d nama_db < marketplace.sql
 ```
 
 ## DEPLOYMENT
