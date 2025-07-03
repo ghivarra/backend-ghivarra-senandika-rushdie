@@ -44,8 +44,8 @@ func RouteRegister() *gin.Engine {
 	adminProductRouterGroup := adminRouterGroup.Group("/product")
 	adminProductRouterGroup.GET("/", product.Get)
 	adminProductRouterGroup.POST("/create", roleCheckMiddleware.Run, product.Create)
-	adminProductRouterGroup.PATCH("/update", product.Update)
-	adminProductRouterGroup.DELETE("/delete", product.Delete)
+	adminProductRouterGroup.PATCH("/update", roleCheckMiddleware.Run, product.Update)
+	adminProductRouterGroup.DELETE("/delete", roleCheckMiddleware.Run, product.Delete)
 
 	// cart group
 	cartRouterGroup := router.Group("/cart")
