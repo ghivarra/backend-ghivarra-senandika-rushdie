@@ -2,6 +2,8 @@ services:
   marketplace-backend-go:
     image: marketplace-backend-go:1.0.0
     container_name: marketplace-backend-go
+    env_file:
+      - ./app/.env
     build:
       context: .
       dockerfile: Dockerfile

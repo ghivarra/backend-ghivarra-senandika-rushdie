@@ -3,6 +3,45 @@ Marketplace Merah Kuning Hijau
 
 ## DEPENDENCY
 - Go versi terbaru. Download [Di Sini](https://go.dev/)
+- PostgreSQL 15. Lihat cara instalasi [Di Sini](https://www.postgresql.org/download/)
+
+## MIGRASI DATABASE
+- Pastikan PostgreSQL sudah terinstall dan berjalan normal.
+- Buat User, Password, dan Database yang akan digunakan dengan command di bawah (khusus Linux / MacOS / UNIX-based):
+
+- Masuk ke postgres
+
+```
+$ -u postgres psql
+```
+
+- Lalu buat user dengan password yang akan digunakan untuk migrasi dan mengakses database
+
+```
+CREATE USER nama_user WITH ENCRYPTED PASSWORD 'password';
+```
+
+- Buat database
+
+```
+CREATE DATABASE nama_db;
+```
+
+- Ubah kepemilikan tabel menjadi nama_user
+
+```
+ALTER TABLE nama_db OWNER TO nama_user;
+```
+- Keluar dari PostgreSQL
+```
+\q
+```
+
+- Lalu selanjutnya jalankan command di bawah ini tepat di root folder aplikasi ini melalui CLI, dan masukkan password:
+
+```
+$ psql -U nama_user -d nama_db --no-owner --no-privileges < marketplace.sql
+```
 
 ## DEPLOYMENT
 - Docker (Any OS)
@@ -12,6 +51,14 @@ Manual instalasi docker, pembuatan image, dan lainnya ada [Di Sini](https://www.
 - CLI / Bash Command (Linux and MacOS)
 Di folder paling utama atau root folder, eksekusi command di bawah ini:
 
-`bash deploy.sh` atau `./deploy.sh`
+```
+bash deploy.sh
+```
 
-Selanjutnya aplikasi akan bisa diakses sesuai dengan konfigurasi .env yang diberikan.
+atau 
+
+```
+./deploy.sh
+```
+
+Selanjutnya aplikasi akan bisa diakses sesuai dengan konfigurasi pada file .env yang diberikan.
