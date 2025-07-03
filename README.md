@@ -1,6 +1,9 @@
 # README
 Marketplace Merah Kuning Hijau
 
+## POSTMAN COLLECTION
+- Download Postman Collection [Di Sini](https://github.com/ghivarra/backend-ghivarra-senandika-rushdie/blob/main/Backend%20Marketplace.postman_collection.json)
+
 ## DEPENDENCY
 - Go versi terbaru. Download [Di Sini](https://go.dev/)
 - PostgreSQL 15. Lihat cara instalasi [Di Sini](https://www.postgresql.org/download/)
