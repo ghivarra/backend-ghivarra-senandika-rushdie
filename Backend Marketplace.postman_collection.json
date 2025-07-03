@@ -1,0 +1,317 @@
+{
+	"info": {
+		"_postman_id": "b6b57de7-15ac-46af-a214-729562926048",
+		"name": "Backend Marketplace",
+		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json",
+		"_exporter_id": "17226759"
+	},
+	"item": [
+		{
+			"name": "Otentikasi",
+			"item": [
+				{
+					"name": "Registrasi",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"username\": \"ghivarrasss\",\n    \"password\": \"user12345\",\n    \"password_confirmation\": \"user12345\",\n    \"name\": \"Ghivarra Senandika\",\n    \"email\": \"gsenandikas1@gmail.com\",\n    \"user_role_id\": 4\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "{{baseHost}}/auth/register"
+					},
+					"response": []
+				},
+				{
+					"name": "Login",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"username\": \"gv-merchant\",\n    \"password\": \"user12345\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "{{baseHost}}/auth/login"
+					},
+					"response": []
+				},
+				{
+					"name": "Checking",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": "{{baseHost}}/auth/check"
+					},
+					"response": []
+				},
+				{
+					"name": "Role List",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": "{{baseHost}}/user-role"
+					},
+					"response": []
+				}
+			],
+			"description": "Registrasi Akun dan Otentikasi menggunakan JWT\n\n- **Registrasi - POST**  \n    Endpoint untuk mendaftar akun merchant/customer. **Parameter:** _username, password, password_confirmation, name, email, user_role_id (menggunakan value dari list ID user role)_\n    \n- **Login - POST**  \n    Endpoint untuk otentikasi menggunakan username dan password untuk mendapatkan token JWT. **Parameter:** _username, password_\n    \n- **Checking - GET**  \n    Endpoint untuk melakukan pengecekan status otentikasi.\n    \n- **Role List - GET**  \n    Endpoint untuk mendapatkan list ID user role."
+		},
+		{
+			"name": "Produk",
+			"item": [
+				{
+					"name": "Tambah Produk",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": ""
+							}
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "name",
+									"value": "Buku Novel",
+									"type": "text"
+								},
+								{
+									"key": "description",
+									"value": "Produk terbaru dan terviral",
+									"type": "text"
+								},
+								{
+									"key": "photo",
+									"type": "file",
+									"src": "/home/ghivarra/Pictures/Gambar/images (1).jpeg"
+								},
+								{
+									"key": "price",
+									"value": "15000",
+									"type": "text"
+								},
+								{
+									"key": "stock",
+									"value": "30",
+									"type": "text"
+								}
+							]
+						},
+						"url": "{{baseHost}}/admin/product/create"
+					},
+					"response": []
+				},
+				{
+					"name": "Lihat Produk",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseHost}}/admin/product?id=8",
+							"host": [
+								"{{baseHost}}"
+							],
+							"path": [
+								"admin",
+								"product"
+							],
+							"query": [
+								{
+									"key": "id",
+									"value": "8"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Produk",
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"url": "{{baseHost}}/admin/product/update"
+					},
+					"response": []
+				},
+				{
+					"name": "Hapus Produk",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"id\": 2\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "{{baseHost}}/admin/product/delete"
+					},
+					"response": []
+				}
+			],
+			"description": "- **Tambah Produk - POST - User Merchant Only**  \n    Endpoint untuk menambah produk -- hanya bagi user dengan role merchant. **Parameter:** _name, description, price, stock, photo_\n    \n- **Lihat Produk - GET**  \n    Endpoint untuk melihat list produk yang sudah ditambahkan oleh merchant, tambahkan parameter \"id\" bila hanya ingin menarik data satu produk saja. **Parameter:** _id_\n    \n- **Update - PATCH - User Merchant Only**  \n    Endpoint untuk melakukan pengecekan status otentikasi. **Parameter:** _name, description, price, stock, photo_\n    \n- **Delete - DELETE - User Merchant Only**  \n    Endpoint untuk mendapatkan list ID user role. **Parameter**: _id_",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"type": "text/javascript",
+						"packages": {},
+						"exec": [
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"packages": {},
+						"exec": [
+							""
+						]
+					}
+				}
+			]
+		},
+		{
+			"name": "Pesanan",
+			"item": [
+				{
+					"name": "Lihat Pesanan",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": "{{baseHost}}/order"
+					},
+					"response": []
+				}
+			],
+			"description": "- **Lihat Pesanan - GET - User Merchant Only**  \n    Endpoint untuk melihat list pesanan yang masuk ke merchant dari customer.",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"type": "text/javascript",
+						"packages": {},
+						"exec": [
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"packages": {},
+						"exec": [
+							""
+						]
+					}
+				}
+			]
+		},
+		{
+			"name": "Keranjang",
+			"item": [
+				{
+					"name": "Tambah Produk",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"product_id\": 8,\n    \"quantity\": 3\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "{{baseHost}}/cart/add-product"
+					},
+					"response": []
+				},
+				{
+					"name": "Lihat Keranjang",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": "{{baseHost}}/cart"
+					},
+					"response": []
+				},
+				{
+					"name": "Pesan Produk",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"cart_ids\" : []\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "{{baseHost}}/cart/buy"
+					},
+					"response": []
+				}
+			],
+			"description": "- **Tambah Produk - POST - User Customer Only**  \n    Endpoint untuk menambah produk ke keranjang -- hanya bagi user dengan role customer. **Parameter:** _product_id_\n    \n- **Lihat Produk - GET - User Customer Only**  \n    Endpoint untuk melihat list produk yang sudah ditambahkan oleh customer ke keranjang\n    \n- **Pesan Produk - POST - User Customer Only**  \n    Endpoint untuk memesan produk dan menerapkan sistem bebas ongkir untuk transaksi > 15000 dan diskon 10% bila transaksi lebih dari 50000. **Parameter:** _cart_ids_"
+		}
+	],
+	"auth": {
+		"type": "bearer",
+		"bearer": {
+			"token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3NTE1ODY1MzAsImlhdCI6IjIwMjUtMDctMDNUMDY6NDg6NTAuOTY5MzYxOTExKzA3OjAwIiwicm9sZSI6IjEiLCJzdWIiOiIyOCJ9.rTecXlPfEv32J2zqWM_7gN1R22YAeDQ5mhkd6zs71XA"
+		}
+	},
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "baseHost",
+			"value": "http://localhost:6789",
+			"type": "string"
+		}
+	]
+}

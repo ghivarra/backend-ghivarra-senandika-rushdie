@@ -17,7 +17,7 @@ RUN CGO_ENABLED=0 GOOS=linux go build -o /docker-go
 
 # Optional:
 # To bind to a TCP port, runtime parameters must be supplied to the docker command.
-EXPOSE 8080
+EXPOSE 6789
 
 # Run
-CMD ["/docker-go"]
+CMD ["./docker-go"]
