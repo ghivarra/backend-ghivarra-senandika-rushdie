@@ -2,5 +2,6 @@
 
 source ~/.bashrc
 cd app
-go build -o dist/goshell
+go get
+GIN_MODE=release go build -o dist/goshell
 ./dist/goshell
